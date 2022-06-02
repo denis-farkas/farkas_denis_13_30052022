@@ -4,6 +4,9 @@
 #api
 /server
 
+#wireframe
+/designs
+
 # dependencies
 /node_modules
 /.pnp
