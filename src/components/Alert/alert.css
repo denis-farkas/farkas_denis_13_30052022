@@ -1,0 +1,10 @@
+.red-gradient {
+  color: white;
+  background: linear-gradient(rgb(208, 28, 22), 70%, rgb(215, 42, 36));
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px 10px;
+  margin: 5px 0;
+  font-size: 12px;
+  font-weight: 500;
+}

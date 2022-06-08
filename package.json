@@ -37,7 +37,8 @@
   },
   "devDependencies": {
     "@types/mongoose": "^5.11.97",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "prettier": "^2.6.2"
   },
   "eslintConfig": {
     "extends": [
