@@ -1,30 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../slices/authSlice';
+import { useNavigate } from 'react-router-dom';
 import Alert from '../Alert';
-import axios from 'axios';
+import isEmail from '../../utils/email';
 import './form.css';
 
 const Form = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [checked, setChecked] = useState(true);
+  const remember = localStorage.getItem('email');
   const [alert, setAlert] = useState({});
+  const [user, setUser] = useState({
+    email: remember,
+    password: '',
+    checked: '',
+  });
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
 
-  function isEmail(email) {
-    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-      email
-    );
-  }
+  useEffect(() => {
+    if (auth.token && auth.isLogged) {
+      navigate('/Profile');
+    }
+  }, [auth.token, auth.isLogged, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if ([email, password].includes('')) {
+    if ([user.email, user.password].includes('')) {
       setAlert({
         msg: 'Each form field is mandatory',
         error: true,
       });
       return;
     }
-    if (!isEmail(email)) {
+    if (!isEmail(user.email)) {
       setAlert({
         msg: 'Email have a wrong format',
         error: true,
@@ -32,23 +41,7 @@ const Form = () => {
       return;
     }
     setAlert({});
-
-    //verify user in api
-    try {
-      const { data } = await axios.post(
-        'http://localhost:3001/api/v1/user/login',
-        {
-          email: email,
-          password: password,
-        }
-      );
-      localStorage.setItem('token', data.body.token);
-    } catch (error) {
-      setAlert({
-        msg: 'Error: user not found !',
-        error: true,
-      });
-    }
+    dispatch(loginUser(user));
   };
 
   const { msg } = alert;
@@ -60,28 +53,32 @@ const Form = () => {
         <label htmlFor="email">Email</label>
         <input
           type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={user.email}
+          onChange={(e) => setUser({ ...user, email: e.target.value })}
         />
       </div>
       <div className="input-wrapper">
         <label htmlFor="password">Password</label>
         <input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setUser({ ...user, password: e.target.value })}
         />
       </div>
       <div className="input-remember">
         <input
           type="checkbox"
           id="remember-me"
-          checked={checked}
-          onChange={(e) => setChecked(!checked)}
+          checked={user.checked}
+          onChange={(e) => setUser({ ...user, checked: !user.checked })}
         />
         <label htmlFor="remember-me">Remember me</label>
       </div>
-      <button className="sign-in-button">Sign In</button>
+      <button className="sign-in-button">
+        {auth.loginStatus === 'pending' ? 'Submitting...' : 'Sign In'}
+      </button>
+      {auth.loginStatus === 'rejected' ? (
+        <p className="error-msg">{auth.loginError}</p>
+      ) : null}
     </form>
   );
 };
