@@ -67,6 +67,7 @@ paths:
       description: API for fetching a user profile
       parameters:
         - in: header
+          type: string
           name: Authorization
           description: Attach Bearer JWT token
           required: true
@@ -91,6 +92,7 @@ paths:
       parameters:
         - in: header
           name: Authorization
+          type: string
           description: Attach Bearer JWT token
           required: true
         - in: body
@@ -106,6 +108,106 @@ paths:
           description: User profile retrieved successully
           schema:
             $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+
+  /user/{account_id}/transactions:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - Transactions
+      summary: User account transactions
+      description: fetch user account transactions
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: integer
+        - in: path
+          name: account_id
+          type: integer
+          required: true
+          description: User account numeric ID to get
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User transactions retrieved successully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+
+  /user/{transaction_id}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Transaction
+      summary: Transaction Details
+      description: See the  transaction in details
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+        - in: path
+          name: transaction_id
+          type: integer
+          required: true
+          description: Numeric ID of the transaction to get
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: details transaction retrieved successfully
+          schema:
+            $ref: '#/definitions/DetailsTransactionResponse'
+
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - Transaction update Details
+      summary: Add Or Edit A Note Or Category
+      description: Add Or Edit A Note Or Category To His Transaction Details
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+        - in: path
+          name: transaction_id
+          type: integer
+          required: true
+          description: Numeric ID of the transaction
+        - in: body
+          name: See, Edit A Note Or Category
+          description: edit a note or category in transaction details
+          required: true
+          schema:
+            $ref: '#/definitions/AddDetails'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: details transactions  updated successfully
+          schema:
+            $ref: '#/definitions/DetailsTransactionResponse'
         '400':
           description: Invalid Fields
         '500':
@@ -163,4 +265,37 @@ definitions:
       firstName:
         type: string
       lastName:
+        type: string
+  Transactions:
+    type: object
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      amount:
+        type: number
+      balance:
+        type: number
+      id:
+        type: integer
+  DetailsTransactionResponse:
+    type: object
+    properties:
+      date:
+        type: string
+      note:
+        type: string
+      category:
+        type: string
+      amount:
+        type: number
+      id:
+        type: integer
+  AddDetails:
+    type: object
+    properties:
+      category:
+        type: string
+      notes:
         type: string

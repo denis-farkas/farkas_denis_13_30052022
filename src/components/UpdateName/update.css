@@ -1,0 +1,44 @@
+.update-content {
+  display: flex;
+  justify-content: space-around;
+  box-sizing: border-box;
+  background-color: white;
+  width: 600px;
+  height: 200px;
+  margin: 3rem auto;
+  padding: 2rem;
+}
+
+.input-wrapper-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 250px;
+}
+
+.input-wrapper-content input {
+  padding: 5px;
+  font-size: 1.2rem;
+}
+
+.right {
+  justify-content: start;
+}
+.left {
+  justify-content: end;
+}
+
+.green-button {
+  display: block;
+  width: 100px;
+  padding: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-top: 8px;
+  border: 2px solid #00bc77;
+  color: #00bc77;
+  background-color: white;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 5px;
+}

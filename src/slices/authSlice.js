@@ -18,6 +18,7 @@ export const loginUser = createAsyncThunk(
       }
 
       sessionStorage.setItem('token', data.body.token);
+      sessionStorage.setItem('isLogged', true);
 
       return data.body.token;
     } catch (error) {
@@ -27,23 +28,21 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const getUser = createAsyncThunk(
-  'user/fetchUserDatas',
-  async (token) => {
-    let response = await axios({
-      method: 'post',
-      url: `${url}/profile`,
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }).catch((err) => console.error(err));
-    return { body: response.data.body, status: response.status };
-  }
-);
+export const getUser = createAsyncThunk('auth/getUser', async (token) => {
+  let response = await axios({
+    method: 'post',
+    url: `${url}/profile`,
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  }).catch((err) => console.error(err));
+  return { body: response.data.body, status: response.status };
+});
 
 export const updateUser = createAsyncThunk(
   'auth/updateUser',
-  async ({ data }) => {
+
+  async (data) => {
     const res = await axios({
       method: 'put',
       url: `${url}/profile`,
@@ -54,7 +53,7 @@ export const updateUser = createAsyncThunk(
         firstName: data.firstName,
         lastName: data.lastName,
       },
-    }).catch((error) => console.log(error.response));
+    }).catch((error) => console.error(error.response));
     return res.status;
   }
 );
@@ -65,6 +64,8 @@ const authSlice = createSlice({
   initialState: {
     token: sessionStorage.getItem('token'),
     loginStatus: '',
+    updateStatus: '',
+    updateError: '',
     loginError: '',
     isLogged: false,
     firstName: '',
@@ -73,11 +74,14 @@ const authSlice = createSlice({
     createdAt: '',
     updatedAt: '',
     status: '',
-    editName: false,
+    editSuccess: false,
   },
 
   reducers: {
     logoutUser(state, action) {
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('isLogged');
+
       return {
         ...state,
         token: '',
@@ -90,7 +94,7 @@ const authSlice = createSlice({
         createdAt: '',
         updatedAt: '',
         status: '',
-        editName: false,
+        editSuccess: false,
       };
     },
     editName: (state) => {
@@ -139,24 +143,43 @@ const authSlice = createSlice({
       };
     });
     builder.addCase(getUser.fulfilled, (state, action) => {
-      return {
-        ...state,
-        firstName: action.payload.body.firstName,
-        lastName: action.payload.body.lastName,
-        id: action.payload.body.id,
-        createdAt: action.payload.body.createdAt,
-        updatedAt: action.payload.body.updatedAt,
-        status: action.payload.status,
-        editName: false,
-      };
+      if (action && action.payload) {
+        return {
+          ...state,
+          firstName: action.payload.body.firstName,
+          lastName: action.payload.body.lastName,
+          id: action.payload.body.id,
+          createdAt: action.payload.body.createdAt,
+          updatedAt: action.payload.body.updatedAt,
+          status: action.payload.status,
+          editSuccess: false,
+        };
+      }
     });
     builder.addCase(getUser.rejected, () => {
       console.log('rejected');
     });
+
+    builder.addCase(updateUser.pending, (state, action) => {
+      return { ...state, updateStatus: 'pending' };
+    });
     builder.addCase(updateUser.fulfilled, (state, action) => {
+      if (action && action.payload === 200) {
+        return (
+          {
+            ...state,
+            updateError: '',
+            updateStatus: 'success',
+            editSuccess: true,
+          },
+          window.location.reload()
+        );
+      }
+    });
+    builder.addCase(updateUser.rejected, (state, action) => {
       return {
         ...state,
-        status: action.payload,
+        updateStatus: 'rejected',
       };
     });
   },
