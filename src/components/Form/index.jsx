@@ -19,10 +19,10 @@ const Form = () => {
   const auth = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (auth.token && auth.isLogged) {
+    if (auth.token) {
       navigate('/Profile');
     }
-  }, [auth.token, auth.isLogged, navigate]);
+  }, [auth.token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

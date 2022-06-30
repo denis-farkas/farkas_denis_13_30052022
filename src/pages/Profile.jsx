@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Bank from '../components/Bank';
 import UpdateName from '../components/UpdateName';
 import Welcome from '../components/Welcome';
+import Home from './Home';
 
 import { getUser } from '../slices/authSlice';
 
@@ -15,20 +16,18 @@ const Profile = () => {
   useEffect(() => {
     dispatch(getUser(token));
   }, [token, dispatch]);
-
-  return editName ? (
-    <>
-      <main className="main bg-dark">
-        <UpdateName />
-        <Bank />
-      </main>
-    </>
-  ) : (
-    <main className="main bg-dark">
-      <Welcome />
-      <Bank />
-    </main>
-  );
+  if (token !== null) {
+    return (
+      <>
+        <main className="main bg-dark">
+          {editName ? <UpdateName /> : <Welcome />}
+          <Bank />
+        </main>
+      </>
+    );
+  } else {
+    return <Home />;
+  }
 };
 
 export default Profile;

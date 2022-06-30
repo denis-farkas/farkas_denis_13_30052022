@@ -114,11 +114,11 @@ paths:
           description: Internal Server Error
 
   /user/{account_id}/transactions:
-    post:
+    get:
       security:
         - Bearer: []
       tags:
-        - Transactions
+        - Transactions Module
       summary: User account transactions
       description: fetch user account transactions
       parameters:
@@ -151,7 +151,7 @@ paths:
       security:
         - Bearer: []
       tags:
-        - Transaction
+        - Transactions Module
       summary: Transaction Details
       description: See the  transaction in details
       parameters:
@@ -177,12 +177,47 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - Transactions Module
+      summary: Add A Note Or Category
+      description: Add A Note Or Category To His Transaction Details
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+        - in: path
+          name: transaction_id
+          type: integer
+          required: true
+          description: Numeric ID of the transaction
+        - in: body
+          name: Add A Note Or Category
+          description: Add a note or category in transaction details
+          required: true
+          schema:
+            $ref: '#/definitions/AddDetails'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: details transactions  created successfully
+          schema:
+            $ref: '#/definitions/DetailsTransactionResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
     put:
       security:
         - Bearer: []
       tags:
-        - Transaction update Details
-      summary: Add Or Edit A Note Or Category
+        - Transactions Module
+      summary: Edit A Note Or Category
       description: Add Or Edit A Note Or Category To His Transaction Details
       parameters:
         - in: header
@@ -208,6 +243,34 @@ paths:
           description: details transactions  updated successfully
           schema:
             $ref: '#/definitions/DetailsTransactionResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - Transactions Module
+      summary: Delete Note And Category
+      description: User delete note and category to his transaction details
+      parameters:
+        - in: path
+          name: transactionId
+          type: integer
+          required: true
+          description: transaction ID to delete details
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: delete details successully
+          schema:
+            type: object
+            properties:
+              deleted:
+                type: boolean
+
         '400':
           description: Invalid Fields
         '500':
